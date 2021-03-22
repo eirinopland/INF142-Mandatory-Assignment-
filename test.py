@@ -1,4 +1,1 @@
-hei alle sammen 
-
-hei på deg
-hei
+print("heiiii")
