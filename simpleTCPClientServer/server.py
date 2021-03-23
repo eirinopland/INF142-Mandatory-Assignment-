@@ -1,6 +1,6 @@
-from socket import socket, AF_INET, SOCK_DGRAM
+from socket import socket
 
-sock = socket(AF_INET, SOCK_DGRAM)
+sock = socket()
 sock.bind(("localhost", 55555))
 
 """
