@@ -7,9 +7,10 @@ from pymongo import MongoClient
 
 
 class Storage:
-    def __init__(self, server_id):
+    def __init__(self, server_id, ip_address):
         self.server_id = server_id
         self.weather_stations = []
+        self.ip_address = ip_address
 
     def generate_data_in_weather_stations(self):
         for station in self.weather_stations:
