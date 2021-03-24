@@ -1,4 +1,4 @@
-# from FMI import *
+from FMI import *
 from Storage import *
 from WeatherStation import WeatherStation
 import pymongo
@@ -49,5 +49,6 @@ if __name__ == "__main__":
     # server2 = StorageTest([station1, station2, station3, station4])
 
     # TODO: Create FMI and pass servers as arguments?
+    fmi = FMI([server1])
 
 

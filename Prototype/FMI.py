@@ -1,29 +1,29 @@
 from socket import socket
 
-class FMI:          #trenger man class hvis det bare skal være 1 FMI som kjører fra CLI?
-    def __init__(self, ):
-        pass
 
-    sock = socket()
-    def retrieve_data_from_server(self, server,location, month): #
+class FMI:
+    def __init__(self, server):
+        self.server = server
 
-        address = server.address #?? kalle på server klassen for å finne addressen ? Ha en input først eventuelt som sender til denne funk
-        sock.connect(address)
+    def retrieve_data_from_server(self, server):
+        sock = socket()
+        sock.connect(server)
+        sentence = ""
         sock.send(sentence.encode())
         data = sock.recv(1024).decode()
 
-        print(f"From storage {server.id}:\nTemperature\tPrecipitation\n {data}") #hvordan kommer data inn? Printe så det blir pent
-
+        print(f"From storage {server.server_id}:\nTemperature\tPrecipitation\n {data}")  #
         sock.close()
 
+    def input_from_cli(self,):
+        location = input("Choose weather station (1,2,3): ")
+        server_num = 0
 
-    def input_from_cli(self,): #passe på at det er gyldig input
-        server = int(input("Choose storage server: "))  #skal vi spørre om storage eller location?
-        location = input("Location: ")
-        month = input("Month: ")
-        return server, location, month
+        # change this:
+        if location == '1':
+            server_num = 1
+        elif location == '2' or location == '3':
+            server_num = 2
 
-if __name__ = "__main__":
-    server, location, month = input_from_cli()
-    retrieve_data_from_server(server,location,month)
-
+        server_address = self.server[server_num-1].ip_address
+        retrieve_data_from_server(server_address)
