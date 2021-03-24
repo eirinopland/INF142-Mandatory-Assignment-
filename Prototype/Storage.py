@@ -1,4 +1,7 @@
 
+import socket
+import json
+
 class Storage:
     def __init__(self, server_id):
         self.server_id = server_id
@@ -19,13 +22,32 @@ class Storage:
         pass
 
     def receive_data_from_station(self):
-        # TODO: call get_data_over_network instead of offline temporary version
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #create UDP socket 
+        #TODO: not sure if we need sock.bind(('ip', 5555))
+        address = ('127.0.0.1', 5555)
+        sock.settimeout(1.0) #set timeout value of 1 second 
+
         for station in self.weather_stations:
-            temperature, percipitation = station.get_data_offline()
-            print("Storage server #" + str(self.server_id) + " weather-station #" + str(
+            sock.sendto(json.dumps({'command':1}), address) #sending request to the weatheer station for command 
+            #TODO: make a protocol, decide port, commands, json etc.
+            #if data is received back from server, then print 
+            try:
+                data = sock.recvfrom(1024)
+                j_data = json.loads(data)
+                temperature, percipitation = j_data['temperature'], j_data['percipitation'] #get temperature and percipitation values from data
+                print("Storage server #" + str(self.server_id) + " weather-station #" + str(
                 station.station_id) + " in location: " + station.location_name)
-            print(temperature)
-            print(percipitation)
+                print(temperature)
+                print(percipitation)
+            #if data is not received back from server, time out 
+            except socket.timeout:
+                print('Request timed out')
+            
+            #temperature, percipitation = station.get_data_over_network()
+            #print("Storage server #" + str(self.server_id) + " weather-station #" + str(
+             #   station.station_id) + " in location: " + station.location_name)
+            #print(temperature)
+            #print(percipitation)
 
     def store_data_in_db(self):
         pass
