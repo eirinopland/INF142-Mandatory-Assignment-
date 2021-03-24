@@ -5,11 +5,10 @@ class FMI:
     def __init__(self, server):
         self.server = server
 
-    def retrieve_data_from_server(self, server):
+    def retrieve_data_from_server(self, server, location):
         sock = socket()
         sock.connect(server)
-        sentence = ""
-        sock.send(sentence.encode())
+        sock.send(location.encode())
         data = sock.recv(1024).decode()
 
         print(f"From storage {server.server_id}:\nTemperature\tPrecipitation\n {data}")  #
@@ -26,4 +25,4 @@ class FMI:
             server_num = 2
 
         server_address = self.server[server_num-1].ip_address
-        retrieve_data_from_server(server_address)
+        self.retrieve_data_from_server(server_address, location)
