@@ -17,7 +17,7 @@ Setup for the system
 
 if __name__ == "__main__":
     # Creating new weather stations
-    server1 = Storage(1)
+    server1 = Storage(1,"")
     station1 = WeatherStation(1)
     server1.add_weather_station(station1)
     station2 = WeatherStation(2)
@@ -28,9 +28,7 @@ if __name__ == "__main__":
     server1.add_weather_station(station4)
 
     # server1.generate_data_in_weather_stations()
-
     # Create a storage server which should be connected to stations 1-4
-
     # server1.receive_data_from_station_offline()
 
     server1.retrieve_data_from_db()

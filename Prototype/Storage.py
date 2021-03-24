@@ -78,7 +78,6 @@ class Storage:
         weather_station.insert_one(new_weather_data)
 
     def retrieve_data_from_db(self):
-        pass
         # login details for cluster:
         # TODO Might have separate login or cluster_name details for each server/storage?
         password = "9FcPzJY7ogaHMn8d"
