@@ -17,9 +17,9 @@ class WeatherStation:
         self.station_id = station_id
 
         self.sock = socket(AF_INET, SOCK_DGRAM) #create UDP socket 
-        self.sock.bind('', 5555) #assign IP address and port number to socket 
-        while True: #continuously handle requests
-            self.handle_request()
+        # self.sock.bind('', 5555) #assign IP address and port number to socket
+        # while True: #continuously handle requests
+        #     self.handle_request()
 
     def generate_data(self, seconds_to_generate_data):
         # Instantiate a station simulator
