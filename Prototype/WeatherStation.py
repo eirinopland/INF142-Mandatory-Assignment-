@@ -4,6 +4,8 @@ from station import StationSimulator
 
 from socket import socket, AF_INET, SOCK_DGRAM
 
+import json
+
 
 class WeatherStation:
     def __init__(self, station_id, location_name="Bergen"):
@@ -13,6 +15,11 @@ class WeatherStation:
         self.precipitation = []
         self.location_name = location_name
         self.station_id = station_id
+
+        self.sock = socket(AF_INET, SOCK_DGRAM) #create UDP socket 
+        self.sock.bind('', 5555) #assign IP address and port number to socket 
+        while True: #continuously handle requests
+            self.handle_request()
 
     def generate_data(self, seconds_to_generate_data):
         # Instantiate a station simulator
@@ -32,6 +39,18 @@ class WeatherStation:
 
         # Shut down the simulation
         self.bergen_station.shut_down()
+
+    def handle_request(self):
+        message, address = self.sock.recvfrom(1024) #receive packet 
+        j_data = json.loads(message)
+        try:
+            if j_data['command'] == 1:
+                #read weather data
+                message = json.dumps({"temperature" : self.bergen_station.temperature, "percipitation" : self.bergen_station.rain})
+                self.sock.sendto(message, address)
+                #TODO: need to store this data? generate_data? 
+        except:
+            pass
 
     def get_data_over_network(self):
         # TODO: Something to send the temperature and precipitation over network
