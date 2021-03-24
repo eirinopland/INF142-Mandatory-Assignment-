@@ -27,11 +27,13 @@ if __name__ == "__main__":
     station4 = WeatherStation(4)
     server1.add_weather_station(station4)
 
-    server1.generate_data_in_weather_stations()
+    # server1.generate_data_in_weather_stations()
 
     # Create a storage server which should be connected to stations 1-4
 
-    server1.receive_data_from_station_offline()
+    # server1.receive_data_from_station_offline()
+
+    server1.retrieve_data_from_db()
 
     # print(pymongo.version)
 

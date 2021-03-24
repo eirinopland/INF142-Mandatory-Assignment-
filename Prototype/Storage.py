@@ -1,5 +1,6 @@
 import socket
 import json
+from datetime import datetime
 
 import pymongo
 from pymongo import MongoClient
@@ -64,9 +65,11 @@ class Storage:
         new_weather_data = {
             "Weather station ID": weather_station.station_id,
             "Location": weather_station.location_name,
+            "Time": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
             "temperature": temperature,
             "precipitation": precipitation
         }
+
         # Create a new database in your cluster
         database = client.Storage_server_test
         # Create a new collection in you database
@@ -74,6 +77,7 @@ class Storage:
         weather_station.insert_one(new_weather_data)
 
     def retrieve_data_from_db(self):
+        pass
         # login details for cluster:
         # TODO Might have separate login or cluster_name details for each server/storage?
         password = "9FcPzJY7ogaHMn8d"
@@ -82,4 +86,8 @@ class Storage:
         # Connect to cluster
         client = MongoClient('mongodb+srv://' + username + ':' + password + '@' + cluster_name
                              + '.hjee9.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
-        pass
+        database = client.Storage_server_test
+        # Create a new collection in you database
+        weather_station = database.Weather_station_test
+        for doc in weather_station.find({}):
+            print(doc)
