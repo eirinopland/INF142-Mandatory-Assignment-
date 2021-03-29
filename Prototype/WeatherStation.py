@@ -15,25 +15,28 @@ class WeatherStation:
         self.precipitation = []
         self.location_name = location_name
         self.station_id = station_id
+        self.generate_data(72)
+        # Is this the proper place for running this function? Might need to be run for each request.
+        # We might run into problems with requests that takes "seconds_to_generate_data" to finish, might also be OK.
 
-        self.sock = socket(AF_INET, SOCK_DGRAM) #create UDP socket 
-        # self.sock.bind('', 5555) #assign IP address and port number to socket
-        # while True: #continuously handle requests
-        #     self.handle_request()
+        self.sock = socket(AF_INET, SOCK_DGRAM)  # create UDP socket
+        self.sock.bind('', 5555)  # assign IP address and port number to socket
+        while True:
+            # continuously handle requests
+            self.handle_request()
 
     def generate_data(self, seconds_to_generate_data):
         # Instantiate a station simulator
         # Turn on the simulator
         self.bergen_station.turn_on()
 
-        # Capture data for 72 hours
+        # Capture data for "seconds_to_generate_data" hours
         # Note that the simulation interval is 1 second
         for _ in range(seconds_to_generate_data):
             # Sleep for 1 second to wait for new weather data
             # to be simulated
             sleep(1)
-            # Read new weather data and append it to the
-            # corresponding list
+            # Read new weather data and append it to the corresponding list
             self.temperature.append(self.bergen_station.temperature)
             self.precipitation.append(self.bergen_station.rain)
 
@@ -41,19 +44,22 @@ class WeatherStation:
         self.bergen_station.shut_down()
 
     def handle_request(self):
-        message, address = self.sock.recvfrom(1024) #receive packet 
+        message, address = self.sock.recvfrom(1024)
         j_data = json.loads(message)
         try:
             if j_data['command'] == 1:
-                #read weather data
-                message = json.dumps({"temperature" : self.bergen_station.temperature, "percipitation" : self.bergen_station.rain})
+                # Read weather data
+                message = json.dumps({"temperature": self.temperature,
+                                      "precipitation": self.precipitation})
                 self.sock.sendto(message, address)
-                #TODO: need to store this data? generate_data? 
+                # TODO: Ask TA's if storing data in lists ("temperature", "precipitation") before sending is OK.
+                # If not, "handle_request" might need to run "generate_data" for each request, and server must wait.
+                # Might also need to reformat "message" before sending.
         except:
             pass
 
     def get_data_over_network(self):
-        # TODO: Something to send the temperature and precipitation over network
+        # The code above replaces the code in this function. Will leave it for now, in case parts of it is needed.
         listOfData = [[self.temperature[i], self.precipitation[i]] for i in range(len(self.temperature))]
         encodedList = []
 
