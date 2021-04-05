@@ -18,8 +18,8 @@ class Storage:
             station.generate_data(10)
 
     def add_weather_station(self, new_station):
-        # Could add weather stations in a dictionary instead, and have name/locaton or id to indicate which to remove
-        #  Probably not necesary
+        # Could add weather stations in a dictionary instead, and have name/location or id to indicate which to remove
+        #  Probably not necessary
         self.weather_stations.append(new_station)
         pass
 
@@ -28,24 +28,23 @@ class Storage:
         pass
 
     def receive_data_from_station_network(self):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #create UDP socket
-        #TODO: not sure if we need sock.bind(('ip', 5555))
-        address = ('127.0.0.1', 5555)
-        sock.settimeout(1.0) #set timeout value of 1 second
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Create UDP socket
+        address = ('localhost', 5555)
+        sock.settimeout(5)
 
         for station in self.weather_stations:
-            sock.sendto(json.dumps({'command':1}), address) #sending request to the weatheer station for command
-            #TODO: make a protocol, decide port, commands, json etc.
-            #if data is received back from server, then print
+            sock.sendto(json.dumps({'command': 1}).encode(), address)  # Send request to the weather station for command
+            # TODO: make a protocol, decide port, commands, json etc.
+            # If data is received back from server, then print
             try:
-                data = sock.recvfrom(1024)
-                j_data = json.loads(data)
-                temperature, percipitation = j_data['temperature'], j_data['percipitation'] #get temperature and percipitation values from data
+                data, _ = sock.recvfrom(1024)
+                j_data = json.loads(data.decode())
+                temperature, precipitation = j_data['temperature'], j_data['precipitation']  # Get temperature and precipitation values from data
                 print("Storage server #" + str(self.server_id) + " weather-station #" + str(
-                station.station_id) + " in location: " + station.location_name)
-                print(temperature)
-                print(percipitation)
-            #if data is not received back from server, time out
+                      station.station_id) + " in location: " + station.location_name)
+                print("Temperature:\n", temperature)
+                print("Precipitation:\n", precipitation)
+            # If data is not received back from server, time out
             except socket.timeout:
                 print('Request timed out')
 

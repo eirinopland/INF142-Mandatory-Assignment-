@@ -20,7 +20,7 @@ class WeatherStation:
         # We might run into problems with requests that takes "seconds_to_generate_data" to finish, might also be OK.
 
         self.sock = socket(AF_INET, SOCK_DGRAM)  # create UDP socket
-        self.sock.bind('', 5555)  # assign IP address and port number to socket
+        self.sock.bind(('localhost', 5555))  # assign IP address and port number to socket
         while True:
             # continuously handle requests
             self.handle_request()
@@ -45,16 +45,15 @@ class WeatherStation:
 
     def handle_request(self):
         message, address = self.sock.recvfrom(1024)
-        j_data = json.loads(message)
+        j_data = json.loads(message.decode())
         try:
             if j_data['command'] == 1:
                 # Read weather data
                 message = json.dumps({"temperature": self.temperature,
                                       "precipitation": self.precipitation})
-                self.sock.sendto(message, address)
+                self.sock.sendto(message.encode(), address)
                 # TODO: Ask TA's if storing data in lists ("temperature", "precipitation") before sending is OK.
                 # If not, "handle_request" might need to run "generate_data" for each request, and server must wait.
-                # Might also need to reformat "message" before sending.
         except:
             pass
 
