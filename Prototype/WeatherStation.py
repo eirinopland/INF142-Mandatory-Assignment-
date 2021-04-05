@@ -7,6 +7,7 @@ from socket import socket, AF_INET, SOCK_DGRAM
 import json
 
 
+
 class WeatherStation:
     def __init__(self, station_id, location_name="Bergen"):
         self.bergen_station = StationSimulator(simulation_interval=1)
@@ -77,3 +78,5 @@ class WeatherStation:
     def get_data_offline(self):
         # returns the arrays holding temperature and precipitation
         return self.temperature, self.precipitation
+
+station = WeatherStation(1)
