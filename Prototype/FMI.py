@@ -12,7 +12,7 @@ class FMI:
         sock.connect(address)
         #while (text := input("> ").lower()) != "shut down":
         sock.send(json.dumps({'command': 1}).encode()) #command 1 means get all data
-        data = sock.recv(1024)
+        data = sock.recv(5120)
         j_data = json.loads(data.decode())
         print(j_data['temperature'], j_data['precipitation'])
         #print(f"From storage {server.server_id}:\nTemperature\tPrecipitation\n {data}") 
