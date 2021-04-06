@@ -10,7 +10,7 @@ from time import sleep
 
 class WeatherStation:
     def __init__(self, server_id, ip_address, location_name):
-        self.ip_address = (ip_address, 5555)
+        self.ip_address = (ip_address, 10000+server_id)
         self.server_id = server_id
         self.location_name = location_name
     
@@ -25,12 +25,10 @@ class WeatherStation:
     
 
 class Storage:
-    def __init__(self):
+    def __init__(self, storage_id):
         self.weather_stations = []
+        self.storage_id = storage_id
         
-        #self.sock.bind(('localhost', 5555))
-
-
     def generate_data_in_weather_stations(self):
         for station in self.weather_stations:
             station.generate_data(10)
@@ -111,25 +109,27 @@ class Storage:
         database = client.Storage_server_test
         # Create a new collection in you database
         weather_station = database.Weather_station_test
-        for doc in weather_station.find({}):
-            print(doc)
+        data = weather_station.find({})
+        return data
+        #for doc in weather_station.find({}):
+            #print(doc)
     
-    def handle_FMI_request(self, sock, connection):
+    def handle_FMI_request(self, connection):
         try:
-            message = sock.recv(1024)
+            message = connection.recv(1024)
             j_data = json.loads(message)
            
             # Echo back the same data you just received
             
             if j_data['command'] == 1:
                 # Read weather data
-                data = retrieve_data_from_db(self, j_data['station'])
+                data = retrieve_data_from_db(self)
                 message = json.dumps(data)
-                sock.send(message)
+                connection.send(message)
                 # TODO: Ask TA's if storing data in lists ("temperature", "precipitation") before sending is OK.
                 # If not, "handle_request" might need to run "generate_data" for each request, and server must wait.
             else:
-                sock.send(json.dumps({'Error': 'Wrong command %d' %j_data['command']}))
+                connection.send(json.dumps({'Error': 'Wrong command %d' %j_data['command']}))
         except:
             pass #do something here 
     
@@ -154,7 +154,7 @@ class Storage:
     
     def FMI_thread(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create TCP socket
-        server_address = ('localhost', 10000)
+        server_address = ('127.0.0.1', 5000+self.storage_id)
         sock.bind(server_address)
 
         # Set the number of clients waiting for connection that can be queued
@@ -165,7 +165,7 @@ class Storage:
             connection, address = sock.accept()
         try:
             while True:
-                    self.handle_FMI_request(sock, connection)
+                    self.handle_FMI_request(connection)
                 #print("Connected from", address)
                 #self.handle_FMI_request(sock)
                 #newSocket.shutdown()
@@ -194,7 +194,7 @@ class Storage:
          #   sock.close()
 
 if __name__ == "__main__":
-    storage = Storage()
+    storage = Storage(1)
     storage.add_weather_station(1, "127.0.0.1", "Bergen")
     thread = threading.Thread(target=storage.FMI_thread)
     thread.start()
