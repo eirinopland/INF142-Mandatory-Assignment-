@@ -6,13 +6,18 @@ class FMI:
         self.server = server
 
     def retrieve_data_from_server(self, server, location):
-        sock = socket()
+        #sock = socket()
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect(server)
-        sock.send(location.encode())
-        data = sock.recv(1024).decode()
-
-        print(f"From storage {server.server_id}:\nTemperature\tPrecipitation\n {data}")  #
+        while (text := input("> ").lower()) != "shut down":
+        sock.send(json.dumps({'command': location}).encode())
+        #sock.send(location.encode())
+        data = sock.recv(1024)
+        j_data = json.loads(data.decode())
+        print(j_data['temperature'], j_data['precipitation'])
+        #print(f"From storage {server.server_id}:\nTemperature\tPrecipitation\n {data}") 
         sock.close()
+
 
     def input_from_cli(self,):
 
@@ -32,6 +37,9 @@ class FMI:
                 break
             else:
                 continue
+        
+        server = ("localhost", 10000)
+        self.retrieve_data_from_server(server, location)
 
-        server_address = self.server[server_num-1].ip_address
-        self.retrieve_data_from_server(server_address, location)
+        #server_address = self.server[server_num-1].ip_address
+        #self.retrieve_data_from_server(server_address, location)

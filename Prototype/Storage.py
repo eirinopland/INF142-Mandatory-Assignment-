@@ -114,7 +114,7 @@ class Storage:
         for doc in weather_station.find({}):
             print(doc)
     
-    def handle_FMI_request(self, sock):
+    def handle_FMI_request(self, sock, connection):
         try:
             message = sock.recv(1024)
             j_data = json.loads(message)
@@ -133,24 +133,65 @@ class Storage:
         except:
             pass #do something here 
     
+    #def handle_FMI_request(self, sock):
+     #   try:
+      #      message = sock.recv(1024)
+       #     j_data = json.loads(message)
+           
+            # Echo back the same data you just received
+            
+        #    if j_data['command'] == 1:
+                # Read weather data
+         #       data = retrieve_data_from_db(self, j_data['station'])
+          #      message = json.dumps(data)
+           #     sock.send(message)
+                # TODO: Ask TA's if storing data in lists ("temperature", "precipitation") before sending is OK.
+                # If not, "handle_request" might need to run "generate_data" for each request, and server must wait.
+            #else:
+             #   sock.send(json.dumps({'Error': 'Wrong command %d' %j_data['command']}))
+        #except:
+         #   pass #do something here 
+    
     def FMI_thread(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create TCP socket
-        sock.bind(('localhost', 5556))
+        server_address = ('localhost', 10000)
+        sock.bind(server_address)
 
         # Set the number of clients waiting for connection that can be queued
         sock.listen(4)
 
         # loop waiting for connections (terminate with Ctrl-C)
+        while True:
+            connection, address = sock.accept()
         try:
             while True:
-                newSocket, address = sock.accept()
+                    self.handle_FMI_request(sock, connection)
                 #print("Connected from", address)
-                self.handle_FMI_request(sock)
+                #self.handle_FMI_request(sock)
                 #newSocket.shutdown()
-                newSocket.close()
+                #newSocket.close()
                 #print("Disconnected from", address)
         finally:
-            sock.close()
+            connection.close()
+    
+    #def FMI_thread(self):
+     #   sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create TCP socket
+      #  sock.bind(('localhost', 5556))
+
+        # Set the number of clients waiting for connection that can be queued
+       # sock.listen(4)
+
+        # loop waiting for connections (terminate with Ctrl-C)
+        #try:
+         #   while True:
+          #      newSocket, address = sock.accept()
+                #print("Connected from", address)
+           #     self.handle_FMI_request(sock)
+                #newSocket.shutdown()
+            #    newSocket.close()
+                #print("Disconnected from", address)
+        #finally:
+         #   sock.close()
 
 if __name__ == "__main__":
     storage = Storage()
