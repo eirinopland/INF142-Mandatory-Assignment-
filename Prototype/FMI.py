@@ -15,14 +15,23 @@ class FMI:
         sock.close()
 
     def input_from_cli(self,):
-        location = input("Choose weather station (1,2,3): ")
-        server_num = 0
 
-        # change this:
-        if location == '1':
-            server_num = 1
-        elif location == '2' or location == '3':
-            server_num = 2
+        servers_dict = {1: '127.0.0.1', 2: '127.0.0.1'}
+
+        while True:
+            storage_num = int(input('Choose storage (1 or 2): '))
+
+            if storage_num in servers_dict:
+                server = servers_dict.get(storage_num)
+                print(server)
+
+            else:
+                print('Invalid input, try again!')
+
+            if not storage_num:
+                break
+            else:
+                continue
 
         server_address = self.server[server_num-1].ip_address
         self.retrieve_data_from_server(server_address, location)
