@@ -21,7 +21,7 @@ class WeatherStation:
         # We might run into problems with requests that takes "seconds_to_generate_data" to finish, might also be OK.
 
         self.sock = socket(AF_INET, SOCK_DGRAM)  # create UDP socket
-        self.sock.bind(('localhost', 5555))  # assign IP address and port number to socket
+        self.sock.bind(('127.0.0.1', 5555))  # assign IP address and port number to socket
         while True:
             # continuously handle requests
             self.handle_request()

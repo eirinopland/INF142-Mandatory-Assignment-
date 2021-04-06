@@ -6,6 +6,7 @@ from datetime import datetime
 import threading
 import pymongo
 from pymongo import MongoClient
+from time import sleep
 
 class WeatherStation:
     def __init__(self, server_id, ip_address, location_name):
@@ -48,8 +49,9 @@ class Storage:
     def receive_data_from_station_network(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Create UDP socket
         #address = (weather_stations[0], 5555)
-        sock.settimeout(5)
-    
+        sock.settimeout(5) #more time? 
+
+        
 
         for station in self.weather_stations:
             sock.sendto(json.dumps({'command': 1}).encode(), station.get_ip_address())  # Send request to the weather station for command
@@ -97,7 +99,7 @@ class Storage:
         weather_station = database.Weather_station_test
         weather_station.insert_one(new_weather_data)
 
-    def retrieve_data_from_db(self):
+    def retrieve_data_from_db(self, station):
         # login details for cluster:
         # TODO Might have separate login or cluster_name details for each server/storage?
         password = "9FcPzJY7ogaHMn8d"
@@ -113,22 +115,27 @@ class Storage:
             print(doc)
     
     def handle_FMI_request(self, sock):
-        message, address = sock.recv(1024)
-        j_data = json.loads(message.decode())
         try:
+            message = sock.recv(1024)
+            j_data = json.loads(message)
+           
+            # Echo back the same data you just received
+            
             if j_data['command'] == 1:
                 # Read weather data
-                message = json.dumps({"temperature": self.temperature,
-                                      "precipitation": self.precipitation})
-                self.sock.sendto(message.encode(), address)
+                data = retrieve_data_from_db(self, j_data['station'])
+                message = json.dumps(data)
+                sock.send(message)
                 # TODO: Ask TA's if storing data in lists ("temperature", "precipitation") before sending is OK.
                 # If not, "handle_request" might need to run "generate_data" for each request, and server must wait.
+            else:
+                sock.send(json.dumps({'Error': 'Wrong command %d' %j_data['command']}))
         except:
-            pass
+            pass #do something here 
     
     def FMI_thread(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create TCP socket
-        sock.bind(('localhost', 5555))
+        sock.bind(('localhost', 5556))
 
         # Set the number of clients waiting for connection that can be queued
         sock.listen(4)
@@ -137,25 +144,23 @@ class Storage:
         try:
             while True:
                 newSocket, address = sock.accept()
-                print("Connected from", address)
+                #print("Connected from", address)
                 self.handle_FMI_request(sock)
-                # loop serving the new client
-                while True:
-                    receivedData = newSocket.recv(1024)
-                    if not receivedData: break
-                    # Echo back the same data you just received
-                    newSocket.send(receivedData)
-                newSocket.close(  )
-                print("Disconnected from", address)
+                #newSocket.shutdown()
+                newSocket.close()
+                #print("Disconnected from", address)
         finally:
-            sock.close(  )
+            sock.close()
 
 if __name__ == "__main__":
     storage = Storage()
     storage.add_weather_station(1, "127.0.0.1", "Bergen")
-    thread = threading.Thread(target=storage.FMI_thread(), args=(1,))
+    thread = threading.Thread(target=storage.FMI_thread)
     thread.start()
-    while True:
+    for _ in range(10):
         storage.receive_data_from_station_network()
+        sleep(1)
+        
+        
 
 
