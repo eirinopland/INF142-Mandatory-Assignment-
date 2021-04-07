@@ -46,25 +46,19 @@ class Storage:
 
     def receive_data_from_station_network(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Create UDP socket
+        self.sock.bind(("127.0.0.1", 5555))  # Do we need different sockets/ports for each WS sending data?
         #address = (weather_stations[0], 5555)
-        sock.settimeout(5) #more time? 
 
-        for station in self.weather_stations:
-            sock.sendto(json.dumps({'command': 1}).encode(), station.get_ip_address())  # Send request to the weather station for command
-            # TODO: make a protocol, decide port, commands, json etc.
-            # If data is received back from server, then print
-            try:
-                data, _ = sock.recvfrom(1024)
-                j_data = json.loads(data.decode())
-                temperature, precipitation = j_data['temperature'], j_data['precipitation']  # Get temperature and precipitation values from data
-                print("Storage server #" + str(station.get_server_id()) + " weather-station #" + str(
-                      station.get_server_id()) + " in location: " + station.location_name)
-                print("Temperature:\n", temperature)
-                print("Precipitation:\n", precipitation)
-                self.store_data_in_db(station, temperature, precipitation)
-            # If data is not received back from server, time out
-            except socket.timeout:
-                print('Request timed out')
+        while True:
+            # Loop until all data is transferred (72 hours), and then stop? Or run indefinitely?
+            data, _ = sock.recvfrom(1024)
+            j_data = json.loads(data.decode())
+            temperature, precipitation = j_data["temperature"], j_data["precipitation"]
+            print("Storage server #" + str(station.get_server_id()) + " weather-station #" + str(
+                  station.get_server_id()) + " in location: " + station.location_name)
+            print("Temperature:\n", temperature)
+            print("Precipitation:\n", precipitation)
+            self.store_data_in_db(station, temperature, precipitation)
 
     def receive_data_from_station_offline(self):
         for station in self.weather_stations:
