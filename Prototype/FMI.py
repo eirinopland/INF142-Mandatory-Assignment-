@@ -18,7 +18,6 @@ class FMI:
         #print(f"From storage {server.server_id}:\nTemperature\tPrecipitation\n {data}") 
         sock.close()
 
-
     def input_from_cli(self,):
 
         servers_dict = {1: {'ip': '127.0.0.1', 'port': 5001}, 2: {'ip': '127.0.0.1', 'port': 5002}}

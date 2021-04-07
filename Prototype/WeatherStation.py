@@ -7,7 +7,6 @@ from socket import socket, AF_INET, SOCK_DGRAM
 import json
 
 
-
 class WeatherStation:
     def __init__(self, station_id, location_name="Bergen"):
         self.bergen_station = StationSimulator(simulation_interval=1)
@@ -58,25 +57,9 @@ class WeatherStation:
         except:
             pass
 
-    def get_data_over_network(self):
-        # The code above replaces the code in this function. Will leave it for now, in case parts of it is needed.
-        listOfData = [[self.temperature[i], self.precipitation[i]] for i in range(len(self.temperature))]
-        encodedList = []
-
-        for i in listOfData:
-            for j in i:
-                jByte = str(j).encode()
-                encodedList.append(jByte)
-
-        sock = socket(AF_INET, SOCK_DGRAM)
-
-        for i in encodedList:
-            # Legg inn addresse/port til riktig storage server, basert på hvilken stasjon data er fra.
-            sock.sendto(i, ("Storage Server Address", 5555))
-        pass
-
     def get_data_offline(self):
         # returns the arrays holding temperature and precipitation
         return self.temperature, self.precipitation
+
 
 station = WeatherStation(1)

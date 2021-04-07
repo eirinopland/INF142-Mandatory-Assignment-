@@ -22,7 +22,7 @@ class WeatherStation:
 
     def get_location_name(self):
         return self.location_name
-    
+
 
 class Storage:
     def __init__(self, storage_id):
@@ -48,8 +48,6 @@ class Storage:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Create UDP socket
         #address = (weather_stations[0], 5555)
         sock.settimeout(5) #more time? 
-
-        
 
         for station in self.weather_stations:
             sock.sendto(json.dumps({'command': 1}).encode(), station.get_ip_address())  # Send request to the weather station for command
@@ -134,26 +132,7 @@ class Storage:
             else:
                 connection.send(json.dumps({'Error': 'Wrong command %d' %j_data['command']}))
         except:
-            pass #do something here 
-    
-    #def handle_FMI_request(self, sock):
-     #   try:
-      #      message = sock.recv(1024)
-       #     j_data = json.loads(message)
-           
-            # Echo back the same data you just received
-            
-        #    if j_data['command'] == 1:
-                # Read weather data
-         #       data = retrieve_data_from_db(self, j_data['station'])
-          #      message = json.dumps(data)
-           #     sock.send(message)
-                # TODO: Ask TA's if storing data in lists ("temperature", "precipitation") before sending is OK.
-                # If not, "handle_request" might need to run "generate_data" for each request, and server must wait.
-            #else:
-             #   sock.send(json.dumps({'Error': 'Wrong command %d' %j_data['command']}))
-        #except:
-         #   pass #do something here 
+            pass #do something here
     
     def FMI_thread(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create TCP socket
@@ -175,25 +154,7 @@ class Storage:
                 #print("Disconnected from", address)
             finally:
                 connection.close()
-    
-    #def FMI_thread(self):
-     #   sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create TCP socket
-      #  sock.bind(('localhost', 5556))
 
-        # Set the number of clients waiting for connection that can be queued
-       # sock.listen(4)
-
-        # loop waiting for connections (terminate with Ctrl-C)
-        #try:
-         #   while True:
-          #      newSocket, address = sock.accept()
-                #print("Connected from", address)
-           #     self.handle_FMI_request(sock)
-                #newSocket.shutdown()
-            #    newSocket.close()
-                #print("Disconnected from", address)
-        #finally:
-         #   sock.close()
 
 if __name__ == "__main__":
     storage = Storage(1)
@@ -203,7 +164,3 @@ if __name__ == "__main__":
     for _ in range(10):
         storage.receive_data_from_station_network()
         sleep(1)
-        
-        
-
-
