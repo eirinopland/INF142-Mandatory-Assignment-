@@ -2,8 +2,8 @@ import socket
 import json
 
 class FMI:
-    def __init__(self, server):
-        self.server = server
+    def __init__(self, storage_info: dict = {1:('127.0.0.1',5001), 2: ('127.0.0.1',5002)}):
+        self._storage_info = storage_info
 
     def retrieve_data_from_server(self, address):
         #sock = socket()
@@ -19,12 +19,10 @@ class FMI:
 
     def input_from_cli(self,):
 
-        servers_dict = {1:('127.0.0.1',5001), 2: ('127.0.0.1',5002)}
-
         while True:
             storage_num = int(input('Choose storage (1 or 2): '))
-            if storage_num in servers_dict:
-                server = servers_dict.get(storage_num)
+            if storage_num in self._storage_info:
+                server = self._storage_info.get(storage_num)
                 self.retrieve_data_from_server(server)
             else:
                 print('Invalid input, try again!')
@@ -33,7 +31,8 @@ class FMI:
             else:
                 continue
         
-        self.retrieve_data_from_server(server)
+        #self.retrieve_data_from_server(server)
 
-fmi = FMI(1)
-fmi.input_from_cli()
+if __name__ == "__main__":
+    fmi = FMI()
+    fmi.input_from_cli()
