@@ -17,16 +17,11 @@ class WeatherStation:
         self.station_id = station_id
         self.generate_data(72)
 
-        self.sock = socket(AF_INET, SOCK_DGRAM)  # create UDP socket
-        self.sock.bind("localhost", 5555)
-        while True:
-            # continuously handle requests
-            self.handle_request()
-
     def generate_data(self, seconds_to_generate_data):
         # Instantiate a station simulator
         # Turn on the simulator
         self.bergen_station.turn_on()
+        sock = socket(AF_INET, SOCK_DGRAM)  # create UDP socket
 
         # Capture data for "seconds_to_generate_data" hours
         # Note that the simulation interval is 1 second
@@ -36,14 +31,10 @@ class WeatherStation:
             sleep(1)
             message = json.dumps({"temperature": self.bergen_station.temperature,
                                   "precipitation": self.bergen_station.rain})
-            self.sock.sendto(message.encode(), ("localhost", 5555))
+            sock.sendto(message.encode(), ("localhost", 5555))
 
         # Shut down the simulation
         self.bergen_station.shut_down()
-
-    def handle_request(self):
-        message, address = self.sock.recvfrom(1024)
-        j_data = json.loads(message.decode())
 
     def get_data_offline(self):
         # returns the arrays holding temperature and precipitation

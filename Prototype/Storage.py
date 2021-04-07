@@ -46,7 +46,7 @@ class Storage:
 
     def receive_data_from_station_network(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Create UDP socket
-        self.sock.bind(("127.0.0.1", 5555))  # Do we need different sockets/ports for each WS sending data?
+        sock.bind(("127.0.0.1", 5555))  # Do we need different sockets/ports for each WS sending data?
         #address = (weather_stations[0], 5555)
 
         while True:
@@ -54,11 +54,11 @@ class Storage:
             data, _ = sock.recvfrom(1024)
             j_data = json.loads(data.decode())
             temperature, precipitation = j_data["temperature"], j_data["precipitation"]
-            print("Storage server #" + str(station.get_server_id()) + " weather-station #" + str(
-                  station.get_server_id()) + " in location: " + station.location_name)
+            # print("Storage server #" + str(station.get_server_id()) + " weather-station #" + str(
+                  # station.get_server_id()) + " in location: " + station.location_name)
             print("Temperature:\n", temperature)
             print("Precipitation:\n", precipitation)
-            self.store_data_in_db(station, temperature, precipitation)
+            # self.store_data_in_db("SomeStationName", temperature, precipitation)
 
     def receive_data_from_station_offline(self):
         for station in self.weather_stations:
