@@ -9,6 +9,7 @@ from pymongo import MongoClient
 from time import sleep
 
 class WeatherStation:
+    # This should not be needed anymore. WeatherStation now sends station_id to Storage.
     def __init__(self, server_id, ip_address, location_name):
         self.ip_address = (ip_address, 10000+server_id)
         self.server_id = server_id
@@ -48,6 +49,11 @@ class Storage:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Create UDP socket
         sock.bind(("127.0.0.1", 5555))  # Do we need different sockets/ports for each WS sending data?
         #address = (weather_stations[0], 5555)
+
+        station_id, _ = sock.recvfrom(1024)
+        station_id = station_id.decode()
+        print(station_id)  # This is the ID sent from station at start of each data transfer.
+        # We need to add this to the same doc in database as the data in the following loop.
 
         while True:
             # Loop until all data is transferred (72 hours), and then stop? Or run indefinitely?

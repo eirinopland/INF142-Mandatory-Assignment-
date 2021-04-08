@@ -23,6 +23,9 @@ class WeatherStation:
         self.bergen_station.turn_on()
         sock = socket(AF_INET, SOCK_DGRAM)  # create UDP socket
 
+        id_to_send = str(self.station_id).encode()
+        sock.sendto(id_to_send, ("localhost", 5555))  # Sends station_id to Storage before transferring data.
+
         # Capture data for "seconds_to_generate_data" hours
         # Note that the simulation interval is 1 second
         for _ in range(seconds_to_generate_data):
