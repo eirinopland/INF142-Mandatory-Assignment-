@@ -1,75 +1,30 @@
-import socket
 import json
-from pymongo import MongoClient
 from datetime import datetime
-#from socket import socket, AF_INET, SOCK_DGRAM, SOCK_STREAM
+from socket import socket, AF_INET, SOCK_DGRAM
 import threading
-import pymongo
 from pymongo import MongoClient
-from time import sleep
-
-class WeatherStation:
-    # This should not be needed anymore. WeatherStation now sends station_id to Storage.
-    def __init__(self, server_id, ip_address, location_name):
-        self.ip_address = (ip_address, 10000+server_id)
-        self.server_id = server_id
-        self.location_name = location_name
-    
-    def get_server_id(self):
-        return self.server_id
-    
-    def get_ip_address(self):
-        return self.ip_address
-
-    def get_location_name(self):
-        return self.location_name
 
 
 class Storage:
     def __init__(self, storage_id):
         self.weather_stations = []
         self.storage_id = storage_id
-        
-    def generate_data_in_weather_stations(self):
-        for station in self.weather_stations:
-            station.generate_data(10)
-
-    def add_weather_station(self, server_id, ip_address, location_name):
-        # Could add weather stations in a dictionary instead, and have name/location or id to indicate which to remove
-        #  Probably not necessary
-        station = WeatherStation(server_id, ip_address, location_name)
-        self.weather_stations.append(station)
-        #pass
-
-    def remove_weather_station(self):
-        # might not be needed at all
-        pass
 
     def receive_data_from_station_network(self):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Create UDP socket
-        sock.bind(("127.0.0.1", 5555))  # Do we need different sockets/ports for each WS sending data?
-        #address = (weather_stations[0], 5555)
+        sock = socket(AF_INET, SOCK_DGRAM)  # Create UDP socket
+        sock.bind(("localhost", 10000 + self.storage_id))
 
         station_id, _ = sock.recvfrom(1024)
         station_id = station_id.decode()
         print(station_id)  # This is the ID sent from station at start of each data transfer.
-        # We need to add this to the same doc in database as the data in the following loop.
+        # TODO: We need to add this to the same doc in database as the data in the following loop.
 
         while True:
-            # Loop until all data is transferred (72 hours), and then stop? Or run indefinitely?
             data, _ = sock.recvfrom(1024)
             j_data = json.loads(data.decode())
-            temperature, precipitation = j_data["temperature"], j_data["precipitation"]
-            # print("Storage server #" + str(station.get_server_id()) + " weather-station #" + str(
-                  # station.get_server_id()) + " in location: " + station.location_name)
-            print("Temperature:\n", temperature)
-            print("Precipitation:\n", precipitation)
-            # self.store_data_in_db("SomeStationName", temperature, precipitation)
+            print(station_id, j_data)
 
-    def receive_data_from_station_offline(self):
-        for station in self.weather_stations:
-            temperature, precipitation = station.get_data_offline()
-            self.store_data_in_db(station, temperature, precipitation)
+            # self.store_data_in_db("SomeStationID", {temperature, precipitation})
 
     def store_data_in_db(self, weather_station, temperature, precipitation):
         # login details for cluster:
@@ -78,8 +33,8 @@ class Storage:
         username = "serverDB"
         cluster_name = "cluster0"
         # Connect to cluster
-        client = MongoClient('mongodb+srv://' + username + ':' + password + '@' + cluster_name
-                             + '.hjee9.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
+        client = MongoClient("mongodb+srv://" + username + ":" + password + "@" + cluster_name
+                             + ".hjee9.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
 
         new_weather_data = {
             "Weather station ID": weather_station.get_server_id(),
@@ -102,8 +57,8 @@ class Storage:
         username = "serverDB"
         cluster_name = "cluster0"
         # Connect to cluster
-        client = MongoClient('mongodb+srv://' + username + ':' + password + '@' + cluster_name
-                             + '.hjee9.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
+        client = MongoClient("mongodb+srv://" + username + ":" + password + "@" + cluster_name
+                             + ".hjee9.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
         database = client.Storage_server_test
         # Create a new collection in you database
         weather_station = database.Weather_station_test
@@ -118,31 +73,26 @@ class Storage:
         try:
             message = connection.recv(1024)
             j_data = json.loads(message)
-           
-            # Echo back the same data you just received
             
-            if j_data['command'] == 1:
-                # Read weather data
-                data = self.retrieve_data_from_db()
-                print(data)
-                message = json.dumps(data)
-                connection.send(message)
-                # TODO: Ask TA's if storing data in lists ("temperature", "precipitation") before sending is OK.
-                # If not, "handle_request" might need to run "generate_data" for each request, and server must wait.
+            if j_data["command"] == 1:
+                # data = self.retrieve_data_from_db()
+                # message = json.dumps(data)
+                message = {"TEST": "TEST"}
+                message = json.dumps(message)
+                connection.send(message.encode())
             else:
-                connection.send(json.dumps({'Error': 'Wrong command %d' %j_data['command']}))
+                connection.send(json.dumps({"Error": "Wrong command %d" % j_data['command']}))
         except:
-            pass #do something here
+            pass  # TODO: Do something here?
     
     def FMI_thread(self):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create TCP socket
-        server_address = ('127.0.0.1', 5001)#self.storage_id)
+        sock = socket()  # Create TCP socket
+        server_address = ("localhost", 5000 + self.storage_id)
         sock.bind(server_address)
 
-        # Set the number of clients waiting for connection that can be queued
+        # TODO: Set the number of clients waiting for connection that can be queued?
         sock.listen(4)
 
-        # loop waiting for connections (terminate with Ctrl-C)
         while True:
             connection, address = sock.accept()
             try:
@@ -157,10 +107,9 @@ class Storage:
 
 
 if __name__ == "__main__":
-    storage = Storage(1)
-    storage.add_weather_station(1, "127.0.0.1", "Bergen")
-    thread = threading.Thread(target=storage.FMI_thread)
-    thread.start()
-    for _ in range(10):
-        storage.receive_data_from_station_network()
-        sleep(1)
+    storage1 = Storage(1)
+    # storage1.FMI_thread()
+    thread1 = threading.Thread(target=storage1.receive_data_from_station_network)
+    thread2 = threading.Thread(target=storage1.FMI_thread)
+    thread2.start()
+    thread1.start()

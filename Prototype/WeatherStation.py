@@ -1,3 +1,4 @@
+import threading
 from time import sleep
 
 from station import StationSimulator
@@ -9,39 +10,31 @@ import json
 
 class WeatherStation:
     def __init__(self, station_id, location_name="Bergen"):
-        self.bergen_station = StationSimulator(simulation_interval=1) # sett til 3600 = 1 time
-        # Two lists for temperature and precipitation
-        self.temperature = []
-        self.precipitation = []
+        self.station1 = StationSimulator(simulation_interval=1)  # TODO: Sett til 3600 = 1 time
         self.location_name = location_name
         self.station_id = station_id
         self.generate_data(72)
 
     def generate_data(self, seconds_to_generate_data):
-        # Instantiate a station simulator
         # Turn on the simulator
-        self.bergen_station.turn_on()
+        self.station1.turn_on()
         sock = socket(AF_INET, SOCK_DGRAM)  # create UDP socket
 
         id_to_send = str(self.station_id).encode()
-        sock.sendto(id_to_send, ("localhost", 5555))  # Sends station_id to Storage before transferring data.
+        sock.sendto(id_to_send, ("localhost", 10000 + self.station_id))
+        # Sends station_id to Storage before transferring data.
 
-        # Capture data for "seconds_to_generate_data" hours
-        # Note that the simulation interval is 1 second
         for _ in range(seconds_to_generate_data):
-            # Sleep for 1 second to wait for new weather data
-            # to be simulated
             sleep(1)
-            message = json.dumps({"temperature": self.bergen_station.temperature,
-                                  "precipitation": self.bergen_station.rain})
-            sock.sendto(message.encode(), ("localhost", 5555))
+
+            # Package data into json object
+            message = json.dumps({"temperature": self.station1.temperature,
+                                  "precipitation": self.station1.rain})
+            sock.sendto(message.encode(), ("localhost", 10000 + self.station_id))
 
         # Shut down the simulation
-        self.bergen_station.shut_down()
-
-    def get_data_offline(self):
-        # returns the arrays holding temperature and precipitation
-        return self.temperature, self.precipitation
+        self.station1.shut_down()
 
 
-station = WeatherStation(1)
+if __name__ == '__main__':
+    station1 = WeatherStation(1)
