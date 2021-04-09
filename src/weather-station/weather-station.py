@@ -29,7 +29,7 @@ class WeatherStation:
 
         while self.running:
             self.send_to_storage(self.weather_station.temperature, self.weather_station.rain)
-            sleep(2)
+            sleep(10)
 
         self.weather_station.shut_down()
         exit(0)

@@ -1,9 +1,8 @@
-# import json
 from socket import socket, AF_INET, SOCK_DGRAM
 from threading import Thread
 import json
 
-# from pymongo import MongoClient
+from pymongo import MongoClient
 
 
 class Storage:
@@ -32,10 +31,7 @@ class Storage:
 
         while True:
             message, _ = station_socket.recvfrom(1024)
-            self.store_data_in_db_locally(message.decode())
-            # j_data = json.loads(message.decode())
-            # print(station_id.decode(), j_data)
-            # self.store_data_in_db("SomeStationID", {temperature, precipitation})
+            self.store_data_in_db(message.decode())
 
     def handle_FMI_requests(self):
         fmi_socket = socket()  # Create TCP socket
@@ -48,8 +44,8 @@ class Storage:
         try:
             self.handle_FMI_connections(connection)
         finally:
-            pass
-            # connection.close()
+            connection.close()
+            fmi_socket.close()
 
     def handle_FMI_connections(self, connection):
         while True:
@@ -59,15 +55,20 @@ class Storage:
                 break
             elif message.decode() == "GET":
                 print("\nReceived request from FMI, transmitting data \n")
-                data_list = []
-                for i in range(self.items_in_db):
-                    data = {}
-                    data["Time and date"] = self.stored_time_and_date[i]
-                    data["Server ID"] = self.storage_id
-                    data["Temperature"] = self.stored_temp[i]
-                    data["Precipitation"] = self.stored_prec[i]
-                    data_list.append(data)
-                j_data = json.dumps(data_list)
+                # data_list = []
+                # for i in range(self.items_in_db):
+                #     data = {}
+                #     data["Time and date"] = self.stored_time_and_date[i]
+                #     data["Server ID"] = self.storage_id
+                #     data["Temperature"] = self.stored_temp[i]
+                #     data["Precipitation"] = self.stored_prec[i]
+                #     data_list.append(data)
+
+                retrieved_data = self.retrieve_data_from_db()
+
+                print(retrieved_data)
+
+                j_data = json.dumps(retrieved_data)
                 connection.sendall(j_data.encode())
             else:
                 connection.send(("400\nBad request - un-recognized command: " + message.decode()).encode())
@@ -91,52 +92,70 @@ class Storage:
     # Storage methods #
     ###################
 
-    # def store_data_in_db(self, data):
-    #     # login details for cluster:
-    #     password = "9FcPzJY7ogaHMn8d"
-    #     username = "serverDB"
-    #
-    #     cluster_name = "cluster0"
-    #     # Connect to cluster
-    #     client = MongoClient("mongodb+srv://" + username + ":" + password + "@" + cluster_name
-    #                          + ".hjee9.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
-    #     database = client.Storage_server_test
-    #
-    #     _, station_id, date, time, temperature, precipitation = self.parse_request(data)
-    #
-    #     new_weather_data = {
-    #         "Station ID": station_id,
-    #         "Date": date,
-    #         "Time": time,
-    #         "temperature": temperature,
-    #         "precipitation": precipitation
-    #     }
-    #
-    #     # Create a new database in your cluster
-    #
-    #     # Create a new collection in you database
-    #     # weather-station = database.Weather_station_test
-    #     # weather-station.insert_one(new_weather_data)
-    #
-    # def retrieve_data_from_db(self):
-    #     # login details for cluster:
-    #     password = "9FcPzJY7ogaHMn8d"
-    #     username = "serverDB"
-    #
-    #     cluster_name = "cluster0"
-    #     # Connect to cluster
-    #     client = MongoClient("mongodb+srv://" + username + ":" + password + "@" + cluster_name
-    #                          + ".hjee9.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
-    #     database = client.Storage_server_test
-    #
-    #     # Create a new collection in you database
-    #     # weather-station = database.Weather_station_test
-    #     # data = weather-station.find({})
-    #     #
-    #     # for doc in weather-station.find({}):
-    #     #     print(doc)
-    #     #
-    #     # #return data
+    def store_data_in_db(self, data: str):
+        # login details for cluster:
+        password = "9FcPzJY7ogaHMn8d"
+        username = "serverDB"
+
+        cluster_name = "cluster0"
+        # Connect to cluster
+        client = MongoClient("mongodb+srv://" + username + ":" + password + "@" + cluster_name
+                             + ".hjee9.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+
+        _, station_id, date, time, temperature, precipitation = self.parse_request(data)
+
+        new_weather_data = {
+            "Station ID": station_id,
+            "Date": date,
+            "Time": time,
+            "temperature": temperature,
+            "precipitation": precipitation
+        }
+
+        database_name = "Weather_Station_" + str(station_id)
+        database = client[database_name]
+        collection_name = "Sensor_Data"
+        collection = database[collection_name]
+
+        # Create a new database in your cluster
+
+        # Create a new collection in you database
+        # weather-station = database.Weather_station_test
+        # weather-station.insert_one(new_weather_data)
+
+        try:
+            collection.insert_one(new_weather_data)
+        except Exception as e:
+            print("Failed to insert ", e)
+
+        print("inserted data into db")
+
+    def retrieve_data_from_db(self, station_id=1):
+        # login details for cluster:
+        password = "9FcPzJY7ogaHMn8d"
+        username = "serverDB"
+
+        cluster_name = "cluster0"
+        # Connect to cluster
+        client = MongoClient("mongodb+srv://" + username + ":" + password + "@" + cluster_name
+                             + ".hjee9.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+
+        database_name = "Weather_Station_" + str(station_id)
+        database = client[database_name]
+        collection_name = "Sensor_Data"
+        collection = database[collection_name]
+
+        data = list(collection.find({}).limit(100))  # .sort("key", DESCENDING)?
+        # Should be a list of dicts
+
+        contents = []
+        #
+        for doc in data:
+            contents.append([(doc["Date"] + " " + doc["Time"]), doc["Station ID"], doc["temperature"], doc["precipitation"]])
+
+        # print(data)
+
+        return contents
 
     ################################
     # Printing and parsing methods #
