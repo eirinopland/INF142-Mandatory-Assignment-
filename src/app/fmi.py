@@ -12,8 +12,9 @@ class FMI:
     def retrieve_data_from_server(self, address, sock):
         sock.send("GET".encode())
         received_message = sock.recv(
-            8192)  # TODO: Need to determine what this should be, must be enough to transmit all weather-data
-        print(received_message.decode())
+            8192).decode()  # TODO: Need to determine what this should be, must be enough to transmit all weather-data
+        received_message = json.loads(received_message)
+        print(received_message)
 
     def input_from_cli(self, ):
         sock = socket()
