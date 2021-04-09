@@ -1,4 +1,5 @@
 from socket import socket
+from flask import Flask, render_template
 import json
 
 
@@ -9,9 +10,9 @@ class FMI:
         self._storage_info = ("localhost", 5001)
 
     def retrieve_data_from_server(self, address, sock):
-        # while (text := input("> ").lower()) != "shut down":
-        sock.send("GET".encode())  
-        received_message = sock.recv(8192) #TODO: Need to determine what this should be, must be enough to transmit all weather-data
+        sock.send("GET".encode())
+        received_message = sock.recv(
+            8192)  # TODO: Need to determine what this should be, must be enough to transmit all weather-data
         print(received_message.decode())
 
     def input_from_cli(self, ):
@@ -26,15 +27,15 @@ class FMI:
                 print('Invalid input, try again!')
 
 
-            # Trying just to do one of each atm
-            # # storage_num = int(selection)
-            # if storage_num in self._storage_info:
-            #     storage_server_address = self._storage_info.get(storage_num)
-            #     self.retrieve_data_from_server(storage_server_address)
-            # else:
-            #     print('Invalid input, try again!')
+app = Flask(__name__)
+
+@app.route("/")
+def web():
+    data = [["dd,mm,yy 23:59:59", "1", "kaldt", "vått"], ["dd,mm,yy 23:59:59", "1", "kaldt", "vått"]]
+    return render_template("index.html", data=data)
 
 
 if __name__ == "__main__":
     fmi = FMI()
-    fmi.input_from_cli()
+    # fmi.input_from_cli()
+    app.run(host="localhost")

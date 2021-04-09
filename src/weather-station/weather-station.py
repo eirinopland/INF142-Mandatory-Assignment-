@@ -13,6 +13,7 @@ class WeatherStation:
         # Turn on the simulator
         self.weather_station.turn_on()
 
+
         # sockets:
         self.storage_socket = socket(AF_INET, SOCK_DGRAM)  # UDP socket
 

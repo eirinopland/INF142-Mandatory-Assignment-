@@ -1,9 +1,11 @@
 FROM python:3.8
 
-COPY requirements.txt requirements.txt
-# or "COPY requirements.txt ."?
+#WORKDIR /usr/src/app
 
-RUN pip install --user -r requirements.txt
+COPY requirements.txt requirements.txt
+#COPY requirements.txt ./
+
+RUN pip install -r requirements.txt
 # --user makes pip install packages in your home directory instead, which doesn't require any special privileges.
 
 # alternatively "RUN pip install --no-cache-dir -r requirements.txt"?
@@ -14,6 +16,8 @@ RUN pip install --user -r requirements.txt
 COPY . .
 
 # ENV?
+
+#ENTRYPOINT ["flask", "run", "--host", "0.0.0.0"]
 
 CMD ["python", "./storage-server.py"]
 # could add -u option to force stdin, stdout and stderr to be unbuffered

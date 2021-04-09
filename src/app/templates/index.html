@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        FMI
+    </title>
+</head>
+<body>
+<!--    <a href="/index">Menu></a><br> button to get back to -->
+<h1>Fictional Meteorological Institute</h1>
+<p>PLACEHOLDER</p>
+<table>
+    <thead>
+    <th scope="col">Date and Time</th>
+    <th scope="col">Server ID</th>
+    <th scope="col">Temperature</th>
+    <th scope="col">Precipitation</th>
+    </thead>
+    <tbody>
+    {% for item in data %}
+    <tr>
+        <td>{{item[0]}}</td>
+        <td>{{item[1]}}</td>
+        <td>{{item[2]}}</td>
+        <td>{{item[3]}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</body>
+</html>
