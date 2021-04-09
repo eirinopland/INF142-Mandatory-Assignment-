@@ -8,7 +8,8 @@ services:
     build:
       context: app
       dockerfile: Dockerfile
-    restart: always
+#    image: user-agent:latest
+#    restart: always
     ports:
       - 5000:5000
     depends_on:
@@ -18,7 +19,8 @@ services:
     build:
       context: storage_server
       dockerfile: Dockerfile
-    restart: always
+#    image: storage_server:latest
+#    restart: always
     ports:
       - 5005:5005
       - 10001:10001
@@ -29,5 +31,6 @@ services:
     build:
       context: weather_station
       dockerfile: Dockerfile
-    restart: always
+#    image: weather_station:latest
+#    restart: always
 
