@@ -9,7 +9,7 @@
 ## Build & Run
 
 ---
-- Clone project from github or download release .zip
+- Clone project from github
 - Once downloaded, run the files:
   - [weather_station.py](src/weather_station/weather_station.py)
     - the station will begin transmitting as soon as it's run, and will continue to do so until it is stopped
