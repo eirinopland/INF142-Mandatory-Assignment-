@@ -1,6 +1,7 @@
 # import json
 from socket import socket, AF_INET, SOCK_DGRAM
 from threading import Thread
+import json
 
 # from pymongo import MongoClient
 
@@ -41,22 +42,18 @@ class Storage:
         receive_from_fmi_address = ("localhost", 5000 + self.storage_id)
         fmi_socket.bind(receive_from_fmi_address)
 
-        # TODO: Set the number of clients waiting for connection that can be queued?
-        fmi_socket.listen(4)
+        fmi_socket.listen(1)
 
-        while True:
-            connection, address = fmi_socket.accept()
-            try:
+        connection, _ = fmi_socket.accept()
+        try:
                 # TODO: Here we could create threads, making one thread per connection if multiple stations
-                self.handle_FMI_connections(connection)
-            finally:
-                connection.close()
+            self.handle_FMI_connections(connection)
+        finally:
+            connection.close()
 
     def handle_FMI_connections(self, connection):
-        count = 0
         while True:
-            count += 1
-            message = connection.recv(1024)
+            message = connection.recv(8192)
             # TODO: handle json or we need to find some way to handle large amounts of data here
             # j_data = json.loads(message)
 
@@ -64,7 +61,8 @@ class Storage:
                 break
             elif message.decode() == "GET":
                 print("\nReceived request from FMI, transmitting data \n")
-                connection.sendall(("\n" + self.pretty_print()).encode())
+                for message in self.pretty_print():
+                    connection.sendall(("\n" + message).encode())
             else:
                 connection.send(("400\nBad request - un-recognized command: " + message.decode()).encode())
         connection.close()
@@ -152,7 +150,7 @@ class Storage:
 
         return command, station_id, date, time, temperature, precipitation
 
-    def pretty_print(self) -> str:
+    def pretty_print(self) -> list:
         """
         Method for creating a better formatted output to terminal
         Should be in the format:
@@ -176,14 +174,15 @@ class Storage:
         newline = "\n"
         header = f"Data from storage server {self.storage_id}:"
         message = header + newline
-
+        message_list = []
         for i in range(self.items_in_db):
             message += \
                 self.stored_time_and_date[i] + " : " + \
                 "Temperature = " + f"{self.stored_temp[i]:06.3F}" + ", " + \
                 "Precipitation = " + f"{self.stored_prec[i]:06.3F}" + newline
+            message_list.append(message)
 
-        return message
+        return message_list
 
 
 if __name__ == "__main__":
