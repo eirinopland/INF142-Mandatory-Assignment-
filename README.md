@@ -4,7 +4,7 @@
 
 ### Mandatory assignment 2
 
-**Authors:** Tor Anders, Eirin, Rakel, Thea og Sindre
+**Authors:** Tor Anders Eri, Eirin Restad Opland, Rakel Rønning Ramsdal, Thea Lindstad Rime og Sindre Larsen 
 
 ## Build & Run
 
