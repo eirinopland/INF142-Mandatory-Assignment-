@@ -9,13 +9,11 @@ from datetime import datetime
 class WeatherStation:
     def __init__(self, station_id):
         # Instantiate a weather-station simulator
-        self.weather_station = StationSimulator(simulation_interval=1)  # TODO: Sett til 3600 = 1 time
+        self.weather_station = StationSimulator(simulation_interval=1)
         self.station_id = station_id
         # Turn on the simulator
         self.weather_station.turn_on()
 
-
-        # sockets:
         self.storage_socket = socket(AF_INET, SOCK_DGRAM)  # UDP socket
 
         # boolean used to determine if the weather-station is running
