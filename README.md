@@ -1,5 +1,14 @@
-# INF142-Mandatory-Assignment-
+# INF142 Project - Fictional Meteorological Institute (FMI)
 
+---
+
+### Mandatory assignment 2
+
+**Authors:** Tor Anders, Eirin, Rakel, Thea og Sindre
+
+## Build & Run
+
+---
 
 ### Terminal commands to run everything:
 #### To build:

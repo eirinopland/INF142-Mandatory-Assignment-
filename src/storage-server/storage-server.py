@@ -2,7 +2,7 @@
 from socket import socket, AF_INET, SOCK_DGRAM
 from threading import Thread
 
-from pymongo import MongoClient
+# from pymongo import MongoClient
 
 
 class Storage:
@@ -87,52 +87,52 @@ class Storage:
     # Storage methods #
     ###################
 
-    def store_data_in_db(self, data):
-        # login details for cluster:
-        password = "9FcPzJY7ogaHMn8d"
-        username = "serverDB"
-
-        cluster_name = "cluster0"
-        # Connect to cluster
-        client = MongoClient("mongodb+srv://" + username + ":" + password + "@" + cluster_name
-                             + ".hjee9.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
-        database = client.Storage_server_test
-
-        _, station_id, date, time, temperature, precipitation = self.parse_request(data)
-
-        new_weather_data = {
-            "Station ID": station_id,
-            "Date": date,
-            "Time": time,
-            "temperature": temperature,
-            "precipitation": precipitation
-        }
-
-        # Create a new database in your cluster
-
-        # Create a new collection in you database
-        # weather-station = database.Weather_station_test
-        # weather-station.insert_one(new_weather_data)
-
-    def retrieve_data_from_db(self):
-        # login details for cluster:
-        password = "9FcPzJY7ogaHMn8d"
-        username = "serverDB"
-
-        cluster_name = "cluster0"
-        # Connect to cluster
-        client = MongoClient("mongodb+srv://" + username + ":" + password + "@" + cluster_name
-                             + ".hjee9.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
-        database = client.Storage_server_test
-
-        # Create a new collection in you database
-        # weather-station = database.Weather_station_test
-        # data = weather-station.find({})
-        #
-        # for doc in weather-station.find({}):
-        #     print(doc)
-        #
-        # #return data
+    # def store_data_in_db(self, data):
+    #     # login details for cluster:
+    #     password = "9FcPzJY7ogaHMn8d"
+    #     username = "serverDB"
+    #
+    #     cluster_name = "cluster0"
+    #     # Connect to cluster
+    #     client = MongoClient("mongodb+srv://" + username + ":" + password + "@" + cluster_name
+    #                          + ".hjee9.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+    #     database = client.Storage_server_test
+    #
+    #     _, station_id, date, time, temperature, precipitation = self.parse_request(data)
+    #
+    #     new_weather_data = {
+    #         "Station ID": station_id,
+    #         "Date": date,
+    #         "Time": time,
+    #         "temperature": temperature,
+    #         "precipitation": precipitation
+    #     }
+    #
+    #     # Create a new database in your cluster
+    #
+    #     # Create a new collection in you database
+    #     # weather-station = database.Weather_station_test
+    #     # weather-station.insert_one(new_weather_data)
+    #
+    # def retrieve_data_from_db(self):
+    #     # login details for cluster:
+    #     password = "9FcPzJY7ogaHMn8d"
+    #     username = "serverDB"
+    #
+    #     cluster_name = "cluster0"
+    #     # Connect to cluster
+    #     client = MongoClient("mongodb+srv://" + username + ":" + password + "@" + cluster_name
+    #                          + ".hjee9.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+    #     database = client.Storage_server_test
+    #
+    #     # Create a new collection in you database
+    #     # weather-station = database.Weather_station_test
+    #     # data = weather-station.find({})
+    #     #
+    #     # for doc in weather-station.find({}):
+    #     #     print(doc)
+    #     #
+    #     # #return data
 
     ################################
     # Printing and parsing methods #
