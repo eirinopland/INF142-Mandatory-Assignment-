@@ -46,16 +46,14 @@ class Storage:
 
         connection, _ = fmi_socket.accept()
         try:
-                # TODO: Here we could create threads, making one thread per connection if multiple stations
             self.handle_FMI_connections(connection)
         finally:
-            connection.close()
+            pass
+            # connection.close()
 
     def handle_FMI_connections(self, connection):
         while True:
             message = connection.recv(8192)
-            # TODO: handle json or we need to find some way to handle large amounts of data here
-            # j_data = json.loads(message)
 
             if not message:
                 break
@@ -65,6 +63,7 @@ class Storage:
                 for i in range(self.items_in_db):
                     data = {}
                     data["Time and date"] = self.stored_time_and_date[i]
+                    data["Server ID"] = self.storage_id
                     data["Temperature"] = self.stored_temp[i]
                     data["Precipitation"] = self.stored_prec[i]
                     data_list.append(data)
@@ -72,7 +71,7 @@ class Storage:
                 connection.sendall(j_data.encode())
             else:
                 connection.send(("400\nBad request - un-recognized command: " + message.decode()).encode())
-        connection.close()
+        # connection.close()
 
     ########################################
     # Storage method (only during runtime) #
