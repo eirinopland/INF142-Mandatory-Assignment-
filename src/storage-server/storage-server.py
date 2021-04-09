@@ -61,8 +61,15 @@ class Storage:
                 break
             elif message.decode() == "GET":
                 print("\nReceived request from FMI, transmitting data \n")
-                for message in self.pretty_print():
-                    connection.sendall(("\n" + message).encode())
+                data_list = []
+                for i in range(self.items_in_db):
+                    data = {}
+                    data["Time and date"] = self.stored_time_and_date[i]
+                    data["Temperature"] = self.stored_temp[i]
+                    data["Precipitation"] = self.stored_prec[i]
+                    data_list.append(data)
+                j_data = json.dumps(data_list)
+                connection.sendall(j_data.encode())
             else:
                 connection.send(("400\nBad request - un-recognized command: " + message.decode()).encode())
         connection.close()
