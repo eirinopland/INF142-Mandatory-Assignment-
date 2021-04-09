@@ -13,21 +13,21 @@ services:
 #    stdin_open: true
 #    tty: true
     depends_on:
-      - "storage-server"
+      - "storage_server"
 
   storage-server:
     build:
-      context: storage-server
+      context: storage_server
       dockerfile: Dockerfile
     ports:
       - 5005:5005
       - 10001:10001
     depends_on:
-      - "weather-station"
+      - "weather_station"
     # add environment here for MONGODB_DATABASE:, USERNAME, PASSWORD, HOSTNAME, COLLECTION
 
   weather-station:
     build:
-      context: weather-station
+      context: weather_station
       dockerfile: Dockerfile
     stdin_open: false

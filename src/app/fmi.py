@@ -6,27 +6,24 @@ app = Flask(__name__)
 
 
 class FMI:
-    def __init__(self, storage_info=None):
-        if storage_info is None:
-            storage_info = {1: ("localhost", 5001), 2: ("localhost", 5002)}
-        self._storage_info = ("localhost", 5001)
+    def __init__(self, host, port):
+        self._storage_server_address = (host, port)
 
     def retrieve_data_from_server(self, sock):
         sock.send("GET".encode())
-        received_message = sock.recv(
-            8192).decode()
-
+        received_message = sock.recv(8192).decode()
+        # Issues might occur if we send too much data ( more than we can receive here )
         return json.loads(received_message)
 
     def input_from_cli(self):
         sock = socket()
-        sock.connect(self._storage_info)
+        sock.connect(self._storage_server_address)
         return self.retrieve_data_from_server(sock)
 
 
 @app.route("/")
 def web():
-    fmi = FMI()
+    fmi = FMI("localhost", 5001)
     data = fmi.input_from_cli()
     return render_template("index.html", data=data)
 

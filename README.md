@@ -9,13 +9,23 @@
 ## Build & Run
 
 ---
+- Clone project from github or download release .zip
+- Once downloaded, run the files:
+  - `weather_station.py`
+    - the station will begin transmitting as soon as it's run, and will continue to do so until it is stopped
+  - `storage_server.py`
+    - Does not need `weather_station.py` to function, only to get new data 
+  - `fmi.py`
+    - Both `fmi.py` and `storage_server.py` needs to be running to be able to view data in browser (localhost:5000)
+    - Some issues with this script, see known bugs section.
 
-### Terminal commands to run everything:
-#### To build:
-- Navigate to /src folder and write `docker-compose build` and press return
-#### To run:
-- Once that has finished, write `docker-compose up` and press return
-- This should give you the Command-line interface for communicating with the user agent (FMI)
-    - Here you will be able to press return to receive all the data stored in the connected servers.
-    - Press return again to get the latest readings
 ---
+## Extra features
+
+- Using MongoDB for cloud-database storage
+- Flask to generate HTML based on template
+
+---
+## Known bugs
+- The user-agent (`fmi.py`) is only able to get data once each run. Refreshing the page in the browser will not work
+  as the connection to `storage_server.py` gets denied when doing this

@@ -105,7 +105,7 @@ class Storage:
         collection_name = "Sensor_Data"
         collection = database[collection_name]
 
-        data = list(collection.find({}).limit(100))  # .sort("key", DESCENDING)?
+        data = list(collection.find({}).limit(50)) #.sort("Date", DESCENDING) #( appears to do this already)
 
         contents = []
 
