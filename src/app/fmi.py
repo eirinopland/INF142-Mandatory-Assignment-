@@ -4,6 +4,7 @@ import json
 
 app = Flask(__name__)
 
+
 class FMI:
     def __init__(self, storage_info=None):
         if storage_info is None:
@@ -22,6 +23,7 @@ class FMI:
         sock = socket()
         sock.connect(self._storage_info)
         return self.retrieve_data_from_server(self._storage_info, sock)
+
 
 @app.route("/")
 def web():
