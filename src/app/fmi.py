@@ -20,10 +20,11 @@ class FMI:
         sock = socket()
         sock.connect(self._storage_info)
         while True:
-            selection = input('(\'ENTER\' to get data)')
+            selection = input('(\'ENTER\' to get data, \'q\' to quit.)')
             if selection == "":
                 self.retrieve_data_from_server(self._storage_info, sock)
-
+            elif selection.lower() == "q":
+                break
             else:
                 print('Invalid input, try again!')
 
