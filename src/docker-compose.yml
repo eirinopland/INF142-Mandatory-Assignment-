@@ -1,0 +1,33 @@
+version: "3"
+
+# Control startup and shutdown order: https://docs.docker.com/compose/startup-order/
+
+services:
+
+  user-agent:
+    build:
+      context: app
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 5000:5000
+    depends_on:
+      - "storage_server"
+
+  storage_server:
+    build:
+      context: storage_server
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 5005:5005
+      - 10001:10001
+    depends_on:
+      - "weather_station"
+
+  weather_station:
+    build:
+      context: weather_station
+      dockerfile: Dockerfile
+    restart: always
+
